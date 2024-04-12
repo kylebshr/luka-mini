@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		27158D492BC998680030EDA8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27158D482BC998680030EDA8 /* Constants.swift */; };
 		27158D4B2BC9998A0030EDA8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27158D4A2BC9998A0030EDA8 /* AppDelegate.swift */; };
+		27A2B5092BC9EBFC005C44D6 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 27A2B5082BC9EBFC005C44D6 /* KeychainAccess */; };
+		27A2B50B2BC9ECB4005C44D6 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A2B50A2BC9ECB4005C44D6 /* Keychain.swift */; };
 		27EC84832BC8949300006239 /* DexcomMenuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EC84822BC8949300006239 /* DexcomMenuApp.swift */; };
-		27EC84852BC8949300006239 /* URLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EC84842BC8949300006239 /* URLView.swift */; };
+		27EC84852BC8949300006239 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EC84842BC8949300006239 /* SettingsView.swift */; };
 		27EC84872BC8949400006239 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27EC84862BC8949400006239 /* Assets.xcassets */; };
 		27EC848A2BC8949400006239 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27EC84892BC8949400006239 /* Preview Assets.xcassets */; };
 		27EC84952BC8949400006239 /* DexcomMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EC84942BC8949400006239 /* DexcomMenuTests.swift */; };
@@ -40,9 +42,10 @@
 /* Begin PBXFileReference section */
 		27158D482BC998680030EDA8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		27158D4A2BC9998A0030EDA8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		27A2B50A2BC9ECB4005C44D6 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		27EC847F2BC8949300006239 /* DexcomMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DexcomMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27EC84822BC8949300006239 /* DexcomMenuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomMenuApp.swift; sourceTree = "<group>"; };
-		27EC84842BC8949300006239 /* URLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLView.swift; sourceTree = "<group>"; };
+		27EC84842BC8949300006239 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		27EC84862BC8949400006239 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27EC84892BC8949400006239 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		27EC848B2BC8949400006239 /* DexcomMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DexcomMenu.entitlements; sourceTree = "<group>"; };
@@ -59,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27A2B5092BC9EBFC005C44D6 /* KeychainAccess in Frameworks */,
 				27EC84B12BC8961800006239 /* Dexcom in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -106,8 +110,9 @@
 				27EC84822BC8949300006239 /* DexcomMenuApp.swift */,
 				27158D4A2BC9998A0030EDA8 /* AppDelegate.swift */,
 				27EC84AD2BC894ED00006239 /* ViewModel.swift */,
-				27EC84842BC8949300006239 /* URLView.swift */,
+				27EC84842BC8949300006239 /* SettingsView.swift */,
 				27158D482BC998680030EDA8 /* Constants.swift */,
+				27A2B50A2BC9ECB4005C44D6 /* Keychain.swift */,
 				27EC84862BC8949400006239 /* Assets.xcassets */,
 				27EC848B2BC8949400006239 /* DexcomMenu.entitlements */,
 				27EC84882BC8949400006239 /* Preview Content */,
@@ -158,6 +163,7 @@
 			name = DexcomMenu;
 			packageProductDependencies = (
 				27EC84B02BC8961800006239 /* Dexcom */,
+				27A2B5082BC9EBFC005C44D6 /* KeychainAccess */,
 			);
 			productName = DexcomMenu;
 			productReference = 27EC847F2BC8949300006239 /* DexcomMenu.app */;
@@ -233,6 +239,7 @@
 			mainGroup = 27EC84762BC8949300006239;
 			packageReferences = (
 				27EC84AF2BC8961800006239 /* XCRemoteSwiftPackageReference "dexcom-swift" */,
+				27A2B5072BC9EBFC005C44D6 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = 27EC84802BC8949300006239 /* Products */;
 			projectDirPath = "";
@@ -276,11 +283,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27EC84852BC8949300006239 /* URLView.swift in Sources */,
+				27EC84852BC8949300006239 /* SettingsView.swift in Sources */,
 				27EC84AE2BC894ED00006239 /* ViewModel.swift in Sources */,
 				27EC84832BC8949300006239 /* DexcomMenuApp.swift in Sources */,
 				27158D4B2BC9998A0030EDA8 /* AppDelegate.swift in Sources */,
 				27158D492BC998680030EDA8 /* Constants.swift in Sources */,
+				27A2B50B2BC9ECB4005C44D6 /* Keychain.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,6 +617,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		27A2B5072BC9EBFC005C44D6 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		27EC84AF2BC8961800006239 /* XCRemoteSwiftPackageReference "dexcom-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kylebshr/dexcom-swift";
@@ -620,6 +636,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		27A2B5082BC9EBFC005C44D6 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27A2B5072BC9EBFC005C44D6 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
 		27EC84B02BC8961800006239 /* Dexcom */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 27EC84AF2BC8961800006239 /* XCRemoteSwiftPackageReference "dexcom-swift" */;

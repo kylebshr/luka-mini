@@ -6,10 +6,11 @@
 //
 
 import AppKit
+import KeychainAccess
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if let window = NSApplication.shared.windows.first {
+        if Keychain.standard[.usernameKey] != nil, let window = NSApplication.shared.windows.first {
             window.close()
         }
     }

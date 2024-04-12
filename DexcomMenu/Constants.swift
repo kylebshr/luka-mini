@@ -8,6 +8,8 @@
 import Foundation
 
 extension String {
-    static let urlKey = "baseURL"
+    static let usernameKey = "username"
+    static let passwordKey = "password"
+    static let outsideUSKey = "ous"
     static let settingsWindow = "settings"
 }

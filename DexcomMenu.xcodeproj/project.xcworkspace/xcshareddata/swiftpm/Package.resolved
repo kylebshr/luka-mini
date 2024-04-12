@@ -1,5 +1,5 @@
 {
-  "originHash" : "1c26b7d1e0d185e9e1634c9973602efffee0c003ff6b6c85362c98b50aeb56aa",
+  "originHash" : "015fe73fc528411c17267c6c67bddf241333024485b26f65697013b59f1afea7",
   "pins" : [
     {
       "identity" : "dexcom-swift",
@@ -8,6 +8,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "fed9471789a7570587de1187572df59a0f7fd164"
+      }
+    },
+    {
+      "identity" : "keychainaccess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
+      "state" : {
+        "branch" : "master",
+        "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
       }
     }
   ],

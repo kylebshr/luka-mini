@@ -7,45 +7,71 @@
 
 import SwiftUI
 import Dexcom
+import KeychainAccess
 
 @Observable class ViewModel {
     enum State {
-        case loading
-        case loaded(GlucoseReading?)
+        case initial
+        case loaded(GlucoseReading)
+        case noRecentReading
+        case error(Error)
     }
 
-    var reading: State = .loading
-    var timestamp: String?
-
-    @ObservationIgnored var url: URL? = UserDefaults.standard.url(forKey: .urlKey) {
-        didSet { beginRefreshing() }
+    var isLoggedIn: Bool {
+        username != nil && password != nil
     }
 
+    private(set) var reading: State = .initial
+    private(set) var message: String?
+
+    private(set) var username: String? = Keychain.standard[.usernameKey]
+    private(set) var password: String? = Keychain.standard[.passwordKey]
+    private var outsideUS: Bool = UserDefaults.standard.bool(forKey: .outsideUSKey)
+
+    private var client: DexcomClient?
     private var timer: Timer?
     private let decoder = JSONDecoder()
 
     private var shouldRefreshReading: Bool {
         switch reading {
-        case .loading:
+        case .initial, .error, .noRecentReading:
             return true
         case .loaded(let reading):
-            if let reading {
-                return reading.date.timeIntervalSinceNow < -60 * 5
-            } else {
-                return true
-            }
+            return reading.date.timeIntervalSinceNow < -60 * 5
         }
     }
 
     init() {
         decoder.dateDecodingStrategy = .iso8601
-        beginRefreshing()
+        setUpClientAndBeginRefreshing()
+    }
+
+    func logIn(username: String, password: String, outsideUS: Bool) {
+        self.username = username
+        self.password = password
+        self.outsideUS = outsideUS
+
+        setUpClientAndBeginRefreshing()
+    }
+
+    private func setUpClientAndBeginRefreshing() {
+        if let username, let password {
+            client = DexcomClient(
+                username: username,
+                password: password,
+                outsideUS: outsideUS
+            )
+
+            beginRefreshing()
+        }
     }
 
     func beginRefreshing() {
-        guard url != nil else { return }
-
         timer?.invalidate()
+
+        guard client != nil else {
+            return
+        }
 
         timer = .scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] _ in
             Task { [weak self] in
@@ -57,25 +83,33 @@ import Dexcom
     }
 
     private func refresh() async {
-        guard let url else { return }
+        guard let client else { return }
 
         if shouldRefreshReading {
-            let currentURL = url.appending(path: "current")
-            guard let (data, _) = try? await URLSession.shared.data(from: currentURL) else {
-                reading = .loaded(nil)
-                timestamp = "No recent readings"
-                return
+            do {
+                if let current = try await client.getCurrentGlucoseReading() {
+                    reading = .loaded(current)
+                } else {
+                    reading = .noRecentReading
+                }
+            } catch {
+                reading = .error(error)
             }
-
-            reading = .loaded(try? decoder.decode(GlucoseReading.self, from: data))
         }
 
-        updateTimestamp()
+        updateMessage()
     }
 
-    private func updateTimestamp() {
-        if case .loaded(let reading) = reading {
-            timestamp = reading?.date.formatted(.relative(presentation: .numeric))
+    private func updateMessage() {
+        switch reading {
+        case .initial:
+            message = "Loading..."
+        case .loaded(let reading):
+            message = reading.date.formatted(.relative(presentation: .numeric))
+        case .noRecentReading:
+            message = "No recent glucose readings"
+        case .error(let error):
+            message = "\(error)"
         }
     }
 }

@@ -12,23 +12,19 @@ import Dexcom
 struct DexcomMenuApp: App {
     @State private var model = ViewModel()
     @Environment(\.openWindow) private var openWindow
-    @AppStorage(.urlKey) private var url: URL?
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Settings", id: .settingsWindow) {
-            URLView { url in
-                model.url = url
-            }
+        Window("DexcomMenu", id: .settingsWindow) {
+            SettingsView(didLogIn: model.logIn)
         }
-        .defaultSize(width: 400, height: 0)
+        .defaultSize(width: 200, height: 0)
 
         MenuBarExtra {
-            if let timestamp = model.timestamp {
+            if let timestamp = model.message {
                 Text(timestamp)
+                Divider()
             }
-
-            Divider()
 
             Button {
                 openWindow(id: .settingsWindow)
@@ -40,16 +36,14 @@ struct DexcomMenuApp: App {
                     }
                 }
             } label: {
-                if url == nil {
-                    Text("Enter URL")
-                } else {
-                    Text("Settings")
-                }
+                Text(model.isLoggedIn ? "Settings" : "Log In")
             }.keyboardShortcut(",")
 
-            Button("Refresh") {
-                model.beginRefreshing()
-            }.keyboardShortcut("r")
+            if model.isLoggedIn {
+                Button("Refresh") {
+                    model.beginRefreshing()
+                }.keyboardShortcut("r")
+            }
 
             Divider()
 
@@ -57,22 +51,22 @@ struct DexcomMenuApp: App {
                 NSApplication.shared.terminate(nil)
             }.keyboardShortcut("q")
         } label: {
-            if url == nil {
-                Text("Dexcom Menu")
-            } else {
+            if model.isLoggedIn {
                 switch model.reading {
-                case .loading:
+                case .initial:
                     Text("--")
                 case .loaded(let reading):
-                    if let reading {
-                        HStack {
-                            Image(systemName: reading.trend.image)
-                            Text("\(reading.value)")
-                        }
-                    } else {
-                        Image(systemName: "icloud.slash")
+                    HStack {
+                        Image(systemName: reading.trend.image)
+                        Text("\(reading.value)")
                     }
+                case .noRecentReading:
+                    Image(systemName: "icloud.slash")
+                case .error:
+                    Image(systemName: "person.crop.circle.badge.xmark")
                 }
+            } else {
+                Text("DexcomMenu")
             }
         }
     }
