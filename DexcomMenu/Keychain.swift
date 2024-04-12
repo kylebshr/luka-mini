@@ -8,5 +8,5 @@
 import KeychainAccess
 
 extension Keychain {
-    static let standard = Keychain(service: "com.kylebashour.DexcomMenu")
+    static let standard = Keychain()
 }

@@ -115,7 +115,7 @@ import KeychainAccess
         case .noRecentReading:
             message = "No recent glucose readings"
         case .error(let error):
-            if let error = error as? DexcomError {
+            if error is DexcomError {
                 message = "Try refreshing in 10 minutes"
             } else {
                 message = "Unknown error"
