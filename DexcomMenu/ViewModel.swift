@@ -9,7 +9,7 @@ import SwiftUI
 import Dexcom
 import KeychainAccess
 
-@Observable class ViewModel {
+@MainActor @Observable class ViewModel {
     enum State {
         case initial
         case loaded(GlucoseReading)
@@ -56,6 +56,8 @@ import KeychainAccess
 
     private func setUpClientAndBeginRefreshing() {
         if let username, let password {
+            reading = .initial
+
             client = DexcomClient(
                 username: username,
                 password: password,
@@ -92,6 +94,10 @@ import KeychainAccess
                 } else {
                     reading = .noRecentReading
                 }
+            } catch let error as DexcomError {
+                // Could be too many attempts; stop auto refreshing.
+                timer?.invalidate()
+                reading = .error(error)
             } catch {
                 reading = .error(error)
             }
@@ -109,7 +115,11 @@ import KeychainAccess
         case .noRecentReading:
             message = "No recent glucose readings"
         case .error(let error):
-            message = "\(error)"
+            if let error = error as? DexcomError {
+                message = "Try refreshing in 10 minutes"
+            } else {
+                message = "Unknown error"
+            }
         }
     }
 }
