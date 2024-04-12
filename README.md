@@ -14,6 +14,9 @@ Follow the instructions at [dexcom-vapor](http://github.com/kylebshr/dexcom-vapo
 
 Enter the URL for your service in the pop up:
 
+![Screenshot 2024-04-12 at 10 48 32 AM](https://github.com/kylebshr/DexcomMenu/assets/3526783/4eb2d590-b3c6-440c-9e65-cb9d62bf53e3)
+
+
 ### 3. That’s it!
 
 The menu bar app checks for updates every minute, so it’s fairly real-time.
