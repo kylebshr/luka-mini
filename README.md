@@ -2,7 +2,7 @@
 
 # DexcomMenu
 
-Simple macOS menu bar app that uses [dexcom-vapor](http://github.com/kylebshr/dexcom-vapor) to display real-time Dexcom CGM readings.
+Simple macOS menu bar app that uses [dexcom-vapor](http://github.com/kylebshr/dexcom-vapor) to display real-time Dexcom CGM readings. Requires macOS Sonoma or later.
 
 ## Getting started
 
