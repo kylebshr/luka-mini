@@ -4,19 +4,28 @@
 
 Simple macOS menu bar app that uses [dexcom-vapor](http://github.com/kylebshr/dexcom-vapor) to display real-time Dexcom CGM readings. Requires macOS Sonoma or later.
 
+![Screenshot 2024-04-12 at 3 18 32 PM](https://github.com/kylebshr/DexcomMenu/assets/3526783/fcbe8a2a-87fa-4e7c-a80c-ac4057a00a73)
+
 ## Getting started
 
-### 1. Deploy dexcom-vapor
+### 1. Enable Sharing
 
-Follow the instructions at [dexcom-vapor](http://github.com/kylebshr/dexcom-vapor) to deploy your own instance.
+For the Dexcom API to work, you must have sharing enabled with at least one person signed up to view your readings. You can invite yourself if you don’t want to actually share.
 
-### 2. Enter your URL
+### 2. Download or Build
 
-Enter the URL for your service in the pop up:
+You can download the latest release from the [releases](https://github.com/kylebshr/DexcomMenu/releases) page, or clone this repo and build the app yourself.
 
-![Screenshot 2024-04-12 at 10 48 32 AM](https://github.com/kylebshr/DexcomMenu/assets/3526783/4eb2d590-b3c6-440c-9e65-cb9d62bf53e3)
+### 3. Allow Keychain Access
 
+DexcomMenu stores your username and password securely in the Keychain. You must grant keychain access when the app is opened for the first time. The app can only access keychain items it stores itself!
 
-### 3. That’s it!
+![Screenshot 2024-04-12 at 4 05 09 PM](https://github.com/kylebshr/DexcomMenu/assets/3526783/c456e26a-e7e5-4f39-87a0-819039403b1e)
 
-The menu bar app checks for updates every minute, so it’s fairly real-time.
+### 4. Log In
+
+You should be prompted to log in. Enter your _normal_ dexcom account details - _not_ the accout you’re sharing with. If your user ID is your phone number, sadly the API does not work. You can create a new Dexcom account with your email to use the API.
+
+![Screenshot 2024-04-12 at 4 10 13 PM](https://github.com/kylebshr/DexcomMenu/assets/3526783/edc4ac93-1b21-4edd-ba54-9aced6620252)
+
+Once you click Log In the menu bar app should start updating!
