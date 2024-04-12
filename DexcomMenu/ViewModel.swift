@@ -15,6 +15,7 @@ import Dexcom
     }
 
     var reading: State = .loading
+    var timestamp: String?
 
     @ObservationIgnored var url: URL? = UserDefaults.standard.url(forKey: .urlKey) {
         didSet { beginRefreshing() }
@@ -22,6 +23,19 @@ import Dexcom
 
     private var timer: Timer?
     private let decoder = JSONDecoder()
+
+    private var shouldRefreshReading: Bool {
+        switch reading {
+        case .loading:
+            return true
+        case .loaded(let reading):
+            if let reading {
+                return reading.date.timeIntervalSinceNow < -60 * 5
+            } else {
+                return true
+            }
+        }
+    }
 
     init() {
         decoder.dateDecodingStrategy = .iso8601
@@ -32,8 +46,8 @@ import Dexcom
         guard url != nil else { return }
 
         timer?.invalidate()
-        
-        timer = .scheduledTimer(withTimeInterval: 60, repeats: true, block: { [weak self] _ in
+
+        timer = .scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] _ in
             Task { [weak self] in
                 await self?.refresh()
             }
@@ -45,12 +59,23 @@ import Dexcom
     private func refresh() async {
         guard let url else { return }
 
-        let currentURL = url.appending(path: "current")
+        if shouldRefreshReading {
+            let currentURL = url.appending(path: "current")
+            guard let (data, _) = try? await URLSession.shared.data(from: currentURL) else {
+                reading = .loaded(nil)
+                timestamp = "No recent readings"
+                return
+            }
 
-        guard let (data, _) = try? await URLSession.shared.data(from: currentURL) else {
-            return reading = .loaded(nil)
+            reading = .loaded(try? decoder.decode(GlucoseReading.self, from: data))
         }
 
-        reading = .loaded(try? decoder.decode(GlucoseReading.self, from: data))
+        updateTimestamp()
+    }
+
+    private func updateTimestamp() {
+        if case .loaded(let reading) = reading {
+            timestamp = reading?.date.formatted(.relative(presentation: .numeric))
+        }
     }
 }

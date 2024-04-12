@@ -24,8 +24,8 @@ struct DexcomMenuApp: App {
         .defaultSize(width: 400, height: 0)
 
         MenuBarExtra {
-            if case .loaded(let reading) = model.reading, let reading {
-                Text(reading.date.formatted(.relative(presentation: .numeric)))
+            if let timestamp = model.timestamp {
+                Text(timestamp)
             }
 
             Divider()
