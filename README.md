@@ -1,10 +1,10 @@
-<img src="https://github.com/kylebshr/DexcomMenu/assets/3526783/2c3e5c01-cda8-4e1b-999c-dba829b9833e" data-canonical-src="https://github.com/kylebshr/DexcomMenu/assets/3526783/2c3e5c01-cda8-4e1b-999c-dba829b9833e" width="44" height="44" />
+<img src="https://github.com/kylebshr/DexcomMenu/assets/3526783/2c3e5c01-cda8-4e1b-999c-dba829b9833e" data-canonical-src="https://github.com/kylebshr/DexcomMenu/assets/3526783/2c3e5c01-cda8-4e1b-999c-dba829b9833e" width="60" />
 
 # DexcomMenu
 
-Simple macOS menu bar app that uses [dexcom-vapor](http://github.com/kylebshr/dexcom-vapor) to display real-time Dexcom CGM readings. Requires macOS Sonoma or later.
+Simple macOS menu bar app that uses [dexcom-swift](http://github.com/kylebshr/dexcom-swift) to display real-time Dexcom CGM readings. Requires macOS Sonoma or later.
 
-![Screenshot 2024-04-12 at 3 18 32 PM](https://github.com/kylebshr/DexcomMenu/assets/3526783/fcbe8a2a-87fa-4e7c-a80c-ac4057a00a73)
+<img src="https://github.com/kylebshr/DexcomMenu/assets/3526783/fcbe8a2a-87fa-4e7c-a80c-ac4057a00a73" data-canonical-src="https://github.com/kylebshr/DexcomMenu/assets/3526783/fcbe8a2a-87fa-4e7c-a80c-ac4057a00a73" width="232" />
 
 ## Getting started
 
@@ -18,7 +18,7 @@ You can download the latest release from the [releases](https://github.com/kyleb
 
 ### 3. Allow Keychain Access
 
-DexcomMenu stores your username and password securely in the Keychain. You must grant keychain access when the app is opened for the first time. The app can only access keychain items it stores itself!
+DexcomMenu stores your username and password securely in the Keychain. If you downloaded the app, you must grant keychain access when the app is opened for the first time. (Don’t worry, the app can only access keychain items that it creates.)
 
 ![Screenshot 2024-04-12 at 4 05 09 PM](https://github.com/kylebshr/DexcomMenu/assets/3526783/c456e26a-e7e5-4f39-87a0-819039403b1e)
 
