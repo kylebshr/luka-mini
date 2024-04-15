@@ -18,7 +18,7 @@ struct DexcomMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Glimpse", id: .settingsWindow) {
+        Window("Glimpse Mini", id: .settingsWindow) {
             SettingsView(didLogIn: model.logIn)
         }
         .defaultSize(width: 200, height: 0)
