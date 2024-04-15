@@ -81,7 +81,7 @@ import KeychainAccess
             return
         }
 
-        timer = .scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] _ in
+        timer = .scheduledTimer(withTimeInterval: 60, repeats: true, block: { [weak self] _ in
             Task { [weak self] in
                 await self?.refresh()
             }
