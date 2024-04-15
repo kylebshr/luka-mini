@@ -117,7 +117,11 @@ import KeychainAccess
         case .initial:
             message = "Loading..."
         case .loaded(let reading):
-            message = reading.date.formatted(.relative(presentation: .numeric))
+            if reading.date.timeIntervalSinceNow > -60 {
+                message = "Just now"
+            } else {
+                message = reading.date.formatted(.relative(presentation: .numeric))
+            }
         case .noRecentReading:
             message = "No recent glucose readings"
         case .error(let error):
