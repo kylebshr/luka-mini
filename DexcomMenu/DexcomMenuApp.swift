@@ -10,12 +10,15 @@ import Dexcom
 
 @main
 struct DexcomMenuApp: App {
+    @AppStorage(.useMMOLKey) private var useMMOL = false
+    @AppStorage(.outsideUSKey) private var outsideUS = false
+
     @State private var model = ViewModel()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("DexcomMenu", id: .settingsWindow) {
+        Window("Glimpse", id: .settingsWindow) {
             SettingsView(didLogIn: model.logIn)
         }
         .defaultSize(width: 200, height: 0)
@@ -29,12 +32,8 @@ struct DexcomMenuApp: App {
             Button {
                 openWindow(id: .settingsWindow)
 
-                DispatchQueue.main.async {
-                    if let window = NSApp.windows.first {
-                        window.makeKeyAndOrderFront(nil)
-                        window.setIsVisible(true)
-                    }
-                }
+                NSApp.activate()
+                NSApp.windows.first?.makeKeyAndOrderFront(nil)
             } label: {
                 Text(model.isLoggedIn ? "Settings" : "Log In")
             }.keyboardShortcut(",")
@@ -56,9 +55,13 @@ struct DexcomMenuApp: App {
                 case .initial:
                     Text("--")
                 case .loaded(let reading):
+                    let value = useMMOL
+                    ? (Double(reading.value) * .mmolConversionFactor).formatted(.number.precision(.fractionLength(1)))
+                    : reading.value.formatted()
+
                     HStack {
                         Image(systemName: reading.trend.image)
-                        Text("\(reading.value)")
+                        Text(value)
                     }
                 case .noRecentReading:
                     Image(systemName: "icloud.slash")
@@ -66,8 +69,11 @@ struct DexcomMenuApp: App {
                     Image(systemName: "person.crop.circle.badge.xmark")
                 }
             } else {
-                Text("DexcomMenu")
+                Text("Glimpse")
             }
+        }
+        .onChange(of: outsideUS) { _, newValue in
+            model.outsideUS = newValue
         }
     }
 }

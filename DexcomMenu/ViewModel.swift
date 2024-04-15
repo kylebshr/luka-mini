@@ -21,12 +21,19 @@ import KeychainAccess
         username != nil && password != nil
     }
 
+    var outsideUS: Bool = UserDefaults.standard.bool(forKey: .outsideUSKey) {
+        didSet { 
+            if outsideUS != oldValue {
+                setUpClientAndBeginRefreshing()
+            }
+        }
+    }
+
     private(set) var reading: State = .initial
     private(set) var message: String?
 
     private(set) var username: String? = Keychain.standard[.usernameKey]
     private(set) var password: String? = Keychain.standard[.passwordKey]
-    private var outsideUS: Bool = UserDefaults.standard.bool(forKey: .outsideUSKey)
 
     private var client: DexcomClient?
     private var timer: Timer?
@@ -46,10 +53,9 @@ import KeychainAccess
         setUpClientAndBeginRefreshing()
     }
 
-    func logIn(username: String, password: String, outsideUS: Bool) {
+    func logIn(username: String, password: String) {
         self.username = username
         self.password = password
-        self.outsideUS = outsideUS
 
         setUpClientAndBeginRefreshing()
     }

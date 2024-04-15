@@ -12,4 +12,9 @@ extension String {
     static let passwordKey = "password"
     static let outsideUSKey = "ous"
     static let settingsWindow = "settings"
+    static let useMMOLKey = "mmol"
+}
+
+extension Double {
+    static let mmolConversionFactor: Double = 0.0555
 }

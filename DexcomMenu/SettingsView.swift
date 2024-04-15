@@ -9,16 +9,25 @@ import SwiftUI
 import KeychainAccess
 
 struct SettingsView: View {
+    @AppStorage(.useMMOLKey) private var mmol = false
+    @AppStorage(.outsideUSKey) private var outsideUS = false
+
     @State private var username = Keychain.standard[.usernameKey] ?? ""
     @State private var password = Keychain.standard[.passwordKey] ?? ""
-    @State private var outsideUS = UserDefaults.standard.bool(forKey: .outsideUSKey)
 
     @Environment(\.dismissWindow) private var dismissWindow
 
-    var didLogIn: (String, String, Bool) -> Void
+    var didLogIn: (String, String) -> Void
 
     var body: some View {
         VStack(alignment: .trailing) {
+            Picker("Units", selection: $mmol) {
+                Text("mg/dl").tag(false)
+                Text("mmol/L").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .padding(.bottom)
+
             TextField("Username", text: $username)
                 .textFieldStyle(.roundedBorder)
 
@@ -32,7 +41,7 @@ struct SettingsView: View {
                 Keychain.standard[.usernameKey] = username
                 Keychain.standard[.passwordKey] = password
 
-                didLogIn(username, password, outsideUS)
+                didLogIn(username, password)
 
                 dismissWindow(id: .settingsWindow)
             }
@@ -40,4 +49,8 @@ struct SettingsView: View {
         }
         .padding()
     }
+}
+
+#Preview {
+    SettingsView(didLogIn: {_, _ in})
 }
