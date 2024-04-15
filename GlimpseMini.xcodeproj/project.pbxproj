@@ -20,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		27020B9C2BCD85CB00571EC5 /* GlimpseMini.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = GlimpseMini.entitlements; sourceTree = "<group>"; };
+		27020B9E2BCD8B7E00571EC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2740006A2BCD84A1002B326B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2740006B2BCD84A1002B326B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2740006C2BCD84A1002B326B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -46,6 +47,7 @@
 		274000722BCD84A1002B326B /* GlimpseMini */ = {
 			isa = PBXGroup;
 			children = (
+				27020B9E2BCD8B7E00571EC5 /* Info.plist */,
 				2740006E2BCD84A1002B326B /* GlimpseMiniApp.swift */,
 				2740006A2BCD84A1002B326B /* AppDelegate.swift */,
 				274000712BCD84A1002B326B /* ViewModel.swift */,
@@ -294,6 +296,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GlimpseMini/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Glimpse Mini";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -324,6 +327,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GlimpseMini/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Glimpse Mini";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_LSUIElement = YES;
