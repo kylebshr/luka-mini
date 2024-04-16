@@ -48,6 +48,7 @@ struct SettingsView: View {
             .disabled(username.isEmpty || password.isEmpty)
         }
         .padding()
+        .frame(minWidth: 300)
     }
 }
 

@@ -22,7 +22,7 @@ struct DexcomMenuApp: App {
             SettingsView(didLogIn: model.logIn)
         }
         .windowResizability(.contentSize)
-        .defaultSize(width: 200, height: 0)
+        .defaultSize(width: 300, height: 0)
 
         MenuBarExtra {
             if let timestamp = model.message {
@@ -33,9 +33,10 @@ struct DexcomMenuApp: App {
             Button {
                 openWindow(id: .settingsWindow)
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    NSApp.windows.first?.makeKeyAndOrderFront(nil)
-                    NSApp.activate(ignoringOtherApps: true)
+                for window in NSApplication.shared.windows {
+                    if window.identifier?.rawValue == .settingsWindow {
+                        window.level = .floating
+                    }
                 }
             } label: {
                 Text(model.isLoggedIn ? "Settings" : "Log In")
