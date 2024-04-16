@@ -96,7 +96,7 @@ extension TrendDirection {
         case .none:
             nil
         case .doubleUp:
-            Image("arrow.up.two")
+            Image("arrow.up.double")
         case .singleUp:
             Image(systemName: "arrow.up")
         case .fortyFiveUp:
@@ -108,7 +108,7 @@ extension TrendDirection {
         case .singleDown:
             Image(systemName: "arrow.down")
         case .doubleDown:
-            Image("arrow.down.two")
+            Image("arrow.down.double")
         case .notComputable:
             Image(systemName: "questionmark")
         case .rateOutOfRange:
