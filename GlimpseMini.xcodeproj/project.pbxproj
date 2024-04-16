@@ -28,7 +28,7 @@
 		2740006F2BCD84A1002B326B /* Keychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		274000702BCD84A1002B326B /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		274000712BCD84A1002B326B /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
-		27EC847F2BC8949300006239 /* GlimpseMini.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GlimpseMini.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27EC847F2BC8949300006239 /* Glimpse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glimpse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +71,7 @@
 		27EC84802BC8949300006239 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				27EC847F2BC8949300006239 /* GlimpseMini.app */,
+				27EC847F2BC8949300006239 /* Glimpse.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -79,9 +79,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		27EC847E2BC8949300006239 /* GlimpseMini */ = {
+		27EC847E2BC8949300006239 /* Glimpse */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 27EC84A42BC8949400006239 /* Build configuration list for PBXNativeTarget "GlimpseMini" */;
+			buildConfigurationList = 27EC84A42BC8949400006239 /* Build configuration list for PBXNativeTarget "Glimpse" */;
 			buildPhases = (
 				27EC847B2BC8949300006239 /* Sources */,
 				27EC847C2BC8949300006239 /* Frameworks */,
@@ -91,13 +91,13 @@
 			);
 			dependencies = (
 			);
-			name = GlimpseMini;
+			name = Glimpse;
 			packageProductDependencies = (
 				27EC84B02BC8961800006239 /* Dexcom */,
 				27A2B5082BC9EBFC005C44D6 /* KeychainAccess */,
 			);
 			productName = DexcomMenu;
-			productReference = 27EC847F2BC8949300006239 /* GlimpseMini.app */;
+			productReference = 27EC847F2BC8949300006239 /* Glimpse.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -132,7 +132,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				27EC847E2BC8949300006239 /* GlimpseMini */,
+				27EC847E2BC8949300006239 /* Glimpse */,
 			);
 		};
 /* End PBXProject section */
@@ -291,7 +291,7 @@
 				CODE_SIGN_ENTITLEMENTS = GlimpseMini/GlimpseMini.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZEAD23GG77;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -306,7 +306,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kylebashour.GlimpseMini;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -322,7 +322,7 @@
 				CODE_SIGN_ENTITLEMENTS = GlimpseMini/GlimpseMini.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZEAD23GG77;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -337,7 +337,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kylebashour.GlimpseMini;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -357,7 +357,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		27EC84A42BC8949400006239 /* Build configuration list for PBXNativeTarget "GlimpseMini" */ = {
+		27EC84A42BC8949400006239 /* Build configuration list for PBXNativeTarget "Glimpse" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27EC84A52BC8949400006239 /* Debug */,
