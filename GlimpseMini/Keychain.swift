@@ -10,6 +10,6 @@ import KeychainAccess
 
 extension Keychain {
     static var standard: Keychain {
-        Keychain().synchronizable(true).attributes([kSecUseDataProtectionKeychain as String: true])
+        Keychain().synchronizable(true)
     }
 }
