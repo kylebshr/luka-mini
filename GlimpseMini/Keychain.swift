@@ -5,8 +5,11 @@
 //  Created by Kyle Bashour on 4/12/24.
 //
 
+import Security
 import KeychainAccess
 
 extension Keychain {
-    static let standard = Keychain().synchronizable(true)
+    static var standard: Keychain {
+        Keychain().synchronizable(true).attributes([kSecUseDataProtectionKeychain as String: true])
+    }
 }
