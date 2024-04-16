@@ -72,7 +72,7 @@ struct DexcomMenuApp: App {
                     : reading.value.formatted()
 
                     HStack {
-                        Image(systemName: reading.trend.image)
+                        reading.trend.image
                         Text(value)
                     }
                 case .noRecentReading:
@@ -91,28 +91,28 @@ struct DexcomMenuApp: App {
 }
 
 extension TrendDirection {
-    var image: String {
+    var image: Image? {
         switch self {
         case .none:
-            "minus"
+            nil
         case .doubleUp:
-            "arrow.up.to.line"
+            Image("arrow.up.two")
         case .singleUp:
-            "arrow.up"
+            Image(systemName: "arrow.up")
         case .fortyFiveUp:
-            "arrow.up.right"
+            Image(systemName: "arrow.up.right")
         case .flat:
-            "arrow.right"
+            Image(systemName: "arrow.right")
         case .fortyFiveDown:
-            "arrow.down.right"
+            Image(systemName: "arrow.down.right")
         case .singleDown:
-            "arrow.down"
+            Image(systemName: "arrow.down")
         case .doubleDown:
-            "arrow.down.to.line"
+            Image("arrow.down.two")
         case .notComputable:
-            "questionmark"
+            Image(systemName: "questionmark")
         case .rateOutOfRange:
-            "exclamationmark"
+            Image(systemName: "exclamationmark")
         }
     }
 }
