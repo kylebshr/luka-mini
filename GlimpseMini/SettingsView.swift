@@ -20,13 +20,17 @@ struct SettingsView: View {
     var didLogIn: (String, String) -> Void
 
     var body: some View {
-        VStack(alignment: .trailing) {
+        VStack(alignment: .leading) {
             Picker("Units", selection: $mmol) {
                 Text("mg/dl").tag(false)
                 Text("mmol/L").tag(true)
             }
             .pickerStyle(.segmented)
             .padding(.bottom)
+
+            Text("Log in using your Dexcom username and password. Dexcom share must be enabled with at least one follower.")
+                .foregroundStyle(.secondary)
+                .padding(.bottom)
 
             TextField("Username", text: $username)
                 .textFieldStyle(.roundedBorder)
@@ -46,9 +50,10 @@ struct SettingsView: View {
                 dismissWindow(id: .settingsWindow)
             }
             .disabled(username.isEmpty || password.isEmpty)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding()
-        .frame(minWidth: 300)
+        .frame(width: 300)
     }
 }
 
