@@ -8,5 +8,5 @@
 import KeychainAccess
 
 extension Keychain {
-    static let standard = Keychain()
+    static let standard = Keychain().synchronizable(true)
 }
