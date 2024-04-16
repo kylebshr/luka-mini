@@ -32,8 +32,10 @@ struct DexcomMenuApp: App {
             Button {
                 openWindow(id: .settingsWindow)
 
-                NSApp.activate()
-                NSApp.windows.first?.makeKeyAndOrderFront(nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    NSApp.activate()
+                    NSApp.windows.first?.makeKeyAndOrderFront(nil)
+                }
             } label: {
                 Text(model.isLoggedIn ? "Settings" : "Log In")
             }.keyboardShortcut(",")
