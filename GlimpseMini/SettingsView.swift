@@ -29,6 +29,7 @@ struct SettingsView: View {
             .padding(.bottom)
 
             Text("Log in using your Dexcom username and password. Dexcom share must be enabled with at least one follower.")
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(.secondary)
                 .padding(.bottom)
 
