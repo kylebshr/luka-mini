@@ -28,7 +28,7 @@ struct SettingsView: View {
             .pickerStyle(.segmented)
             .padding(.bottom)
 
-            Text("Log in using your Dexcom username and password. Dexcom share must be enabled with at least one follower.")
+            Text("Sign in using your Dexcom username and password. Dexcom share must be enabled with at least one follower.")
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(.secondary)
                 .padding(.bottom)
@@ -42,7 +42,7 @@ struct SettingsView: View {
             Toggle("Outside US", isOn: $outsideUS)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Button("Log In") {
+            Button("Sign In") {
                 Keychain.standard[.usernameKey] = username
                 Keychain.standard[.passwordKey] = password
 
