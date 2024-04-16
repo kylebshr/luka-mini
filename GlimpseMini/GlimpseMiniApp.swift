@@ -21,6 +21,7 @@ struct DexcomMenuApp: App {
         Window("Glimpse Mini", id: .settingsWindow) {
             SettingsView(didLogIn: model.logIn)
         }
+        .windowResizability(.contentSize)
         .defaultSize(width: 200, height: 0)
 
         MenuBarExtra {
@@ -33,8 +34,8 @@ struct DexcomMenuApp: App {
                 openWindow(id: .settingsWindow)
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    NSApp.activate()
                     NSApp.windows.first?.makeKeyAndOrderFront(nil)
+                    NSApp.activate(ignoringOtherApps: true)
                 }
             } label: {
                 Text(model.isLoggedIn ? "Settings" : "Log In")
