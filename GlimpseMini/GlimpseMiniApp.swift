@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Dexcom
+import KeychainAccess
 
 @main
 struct DexcomMenuApp: App {
@@ -29,6 +30,13 @@ struct DexcomMenuApp: App {
                 Text(timestamp)
                 Divider()
             }
+
+            #if DEBUG
+            Button("Reset Keychain") {
+                Keychain.standard[.usernameKey] = nil
+                Keychain.standard[.passwordKey] = nil
+            }
+            #endif
 
             Button {
                 openWindow(id: .settingsWindow)
