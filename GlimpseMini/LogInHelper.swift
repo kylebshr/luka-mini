@@ -9,19 +9,17 @@ import SwiftUI
 import ServiceManagement
 
 @Observable class LoginItemHelper {
-    private static let item = SMAppService.loginItem(identifier: Bundle.main.bundleIdentifier!)
-
-    var isEnabled = LoginItemHelper.item.status == .enabled {
+    var isEnabled = SMAppService.mainApp.status == .enabled {
         didSet {
             do {
                 if isEnabled {
-                    if Self.item.status == .enabled {
-                        try? Self.item.unregister()
+                    if SMAppService.mainApp.status == .enabled {
+                        try? SMAppService.mainApp.unregister()
                     }
 
-                    try Self.item.register()
+                    try SMAppService.mainApp.register()
                 } else {
-                    try Self.item.unregister()
+                    try SMAppService.mainApp.unregister()
                 }
             } catch {
                 print("Failed to toggle menu bar item.")

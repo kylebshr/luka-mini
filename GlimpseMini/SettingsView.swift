@@ -14,7 +14,6 @@ struct SettingsView: View {
 
     @State private var username = Keychain.standard[.usernameKey] ?? ""
     @State private var password = Keychain.standard[.passwordKey] ?? ""
-    @State private var loginHelper = LoginItemHelper()
 
     @Environment(\.dismissWindow) private var dismissWindow
 
@@ -22,24 +21,16 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            GroupBox {
-                VStack(alignment: .leading) {
-                    Picker("Units", selection: $mmol) {
-                        Text("mg/dl").tag(false)
-                        Text("mmol/L").tag(true)
-                    }
-                    .pickerStyle(.segmented)
-
-                    Toggle("Launch at Login", isOn: $loginHelper.isEnabled)
-                }
-                .padding(5)
+            Picker("Units", selection: $mmol) {
+                Text("mg/dl").tag(false)
+                Text("mmol/L").tag(true)
             }
-            .padding(.bottom)
+            .pickerStyle(.segmented)
 
             Text("Sign in using your Dexcom username and password. Dexcom share must be enabled with at least one follower.")
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(.secondary)
-                .padding(.bottom)
+                .padding(.vertical)
 
             TextField("Username", text: $username)
                 .textFieldStyle(.roundedBorder)

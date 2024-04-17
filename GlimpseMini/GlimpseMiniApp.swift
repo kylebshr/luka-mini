@@ -14,8 +14,11 @@ struct DexcomMenuApp: App {
     @AppStorage(.useMMOLKey) private var useMMOL = false
     @AppStorage(.outsideUSKey) private var outsideUS = false
 
+    @State private var loginHelper = LoginItemHelper()
     @State private var model = ViewModel()
+    
     @Environment(\.openWindow) private var openWindow
+    
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
@@ -31,12 +34,13 @@ struct DexcomMenuApp: App {
                 Divider()
             }
 
-            #if DEBUG
-            Button("Reset Keychain") {
-                Keychain.standard[.usernameKey] = nil
-                Keychain.standard[.passwordKey] = nil
+            Toggle("Open at Login", isOn: $loginHelper.isEnabled)
+
+            if model.isLoggedIn {
+                Button("Manually Refresh") {
+                    model.beginRefreshing()
+                }
             }
-            #endif
 
             Button {
                 openWindow(id: .settingsWindow)
@@ -50,17 +54,20 @@ struct DexcomMenuApp: App {
                 Text(model.isLoggedIn ? "Settings" : "Log In")
             }.keyboardShortcut(",")
 
-            if model.isLoggedIn {
-                Button("Refresh") {
-                    model.beginRefreshing()
-                }.keyboardShortcut("r")
-            }
-
             Divider()
 
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }.keyboardShortcut("q")
+
+            #if DEBUG
+            Divider()
+
+            Button("Reset Keychain") {
+                Keychain.standard[.usernameKey] = nil
+                Keychain.standard[.passwordKey] = nil
+            }
+            #endif
         } label: {
             if model.isLoggedIn {
                 switch model.reading {

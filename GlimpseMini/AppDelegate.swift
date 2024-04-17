@@ -13,10 +13,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if Keychain.standard[.usernameKey] != nil, let window = NSApplication.shared.windows.first {
             window.close()
         }
-
-        if !UserDefaults.standard.bool(forKey: .didSetInitialLoginItem) {
-            UserDefaults.standard.set(true, forKey: .didSetInitialLoginItem)
-            LoginItemHelper().isEnabled = true
-        }
     }
 }
