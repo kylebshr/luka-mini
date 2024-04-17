@@ -22,7 +22,7 @@ struct DexcomMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Glimpse Mini", id: .settingsWindow) {
+        Window("Glimpse", id: .settingsWindow) {
             SettingsView(didLogIn: model.logIn)
         }
         .windowResizability(.contentSize)
