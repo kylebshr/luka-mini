@@ -16,6 +16,7 @@
 		2740007D2BCD84A1002B326B /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274000712BCD84A1002B326B /* ViewModel.swift */; };
 		27A2B5092BC9EBFC005C44D6 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 27A2B5082BC9EBFC005C44D6 /* KeychainAccess */; };
 		27EC84B12BC8961800006239 /* Dexcom in Frameworks */ = {isa = PBXBuildFile; productRef = 27EC84B02BC8961800006239 /* Dexcom */; };
+		27F4F49D2BCF77A300D84241 /* LogInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F4F49C2BCF77A300D84241 /* LogInHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		274000702BCD84A1002B326B /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		274000712BCD84A1002B326B /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		27EC847F2BC8949300006239 /* Glimpse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glimpse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27F4F49C2BCF77A300D84241 /* LogInHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +51,7 @@
 			children = (
 				27020B9E2BCD8B7E00571EC5 /* Info.plist */,
 				2740006E2BCD84A1002B326B /* GlimpseMiniApp.swift */,
+				27F4F49C2BCF77A300D84241 /* LogInHelper.swift */,
 				2740006A2BCD84A1002B326B /* AppDelegate.swift */,
 				274000712BCD84A1002B326B /* ViewModel.swift */,
 				274000702BCD84A1002B326B /* SettingsView.swift */,
@@ -157,6 +160,7 @@
 				2740007D2BCD84A1002B326B /* ViewModel.swift in Sources */,
 				2740007C2BCD84A1002B326B /* SettingsView.swift in Sources */,
 				274000792BCD84A1002B326B /* Constants.swift in Sources */,
+				27F4F49D2BCF77A300D84241 /* LogInHelper.swift in Sources */,
 				274000772BCD84A1002B326B /* AppDelegate.swift in Sources */,
 				2740007B2BCD84A1002B326B /* Keychain.swift in Sources */,
 			);

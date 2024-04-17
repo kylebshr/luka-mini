@@ -13,6 +13,7 @@ extension String {
     static let outsideUSKey = "ous"
     static let settingsWindow = "settings"
     static let useMMOLKey = "mmol"
+    static let didSetInitialLoginItem = "didSetLoginItem"
 }
 
 extension Double {
