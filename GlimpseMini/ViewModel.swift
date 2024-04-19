@@ -36,7 +36,6 @@ import KeychainAccess
     private(set) var password: String? = Keychain.standard[.passwordKey]
 
     private var client: DexcomClient?
-    private var timer: Timer?
     private let decoder = JSONDecoder()
 
     private var shouldRefreshReading: Bool {
@@ -75,41 +74,61 @@ import KeychainAccess
     }
 
     func beginRefreshing() {
-        timer?.invalidate()
-
-        guard client != nil else {
-            return
-        }
-
-        timer = .scheduledTimer(withTimeInterval: 60, repeats: true, block: { [weak self] _ in
-            Task { [weak self] in
-                await self?.refresh()
-            }
-        })
-
-        timer?.fire()
-    }
-
-    private func refresh() async {
         guard let client else { return }
 
-        if shouldRefreshReading {
-            do {
-                if let current = try await client.getCurrentGlucoseReading() {
-                    reading = .loaded(current)
-                } else {
-                    reading = .noRecentReading
+        Task<Void, Never> {
+            if shouldRefreshReading {
+                print("Refreshing reading")
+
+                do {
+                    if let current = try await client.getCurrentGlucoseReading() {
+                        reading = .loaded(current)
+                    } else {
+                        reading = .noRecentReading
+                    }
+                } catch let error as DexcomError {
+                    // Could be too many attempts; stop auto refreshing.
+                    reading = .error(error)
+                } catch {
+                    reading = .error(error)
                 }
-            } catch let error as DexcomError {
-                // Could be too many attempts; stop auto refreshing.
-                timer?.invalidate()
-                reading = .error(error)
-            } catch {
-                reading = .error(error)
+            }
+
+            updateMessage()
+
+            let refreshTime: TimeInterval? = {
+                switch reading {
+                case .initial:
+                    return nil
+                case .loaded(let reading):
+                    // 5:10 after the last reading.
+                    let fiveMinuteRefresh = 60 * 5 + reading.date.timeIntervalSinceNow + 10
+                    // Refresh 5:10 after reading, then every 10s.
+                    return max(10, fiveMinuteRefresh)
+                case .noRecentReading:
+                    return 10
+                case .error(let error):
+                    if error is DexcomError {
+                        return nil
+                    } else {
+                        return 10
+                    }
+                }
+            }()
+
+            if let refreshTime {
+                // Refresh at least every 60s for the time stamp.
+                let refreshTime = min(60, refreshTime)
+
+                print("Scheduling refresh in \(refreshTime / 60) minutes")
+                
+                Timer.scheduledTimer(withTimeInterval: refreshTime, repeats: false) { [weak self] _ in
+                    DispatchQueue.main.async { [weak self] in
+                        self?.beginRefreshing()
+                    }
+                }
             }
         }
-
-        updateMessage()
     }
 
     private func updateMessage() {
