@@ -12,7 +12,7 @@ import KeychainAccess
 @main
 struct DexcomMenuApp: App {
     @AppStorage(.useMMOLKey) private var useMMOL = false
-    @AppStorage(.outsideUSKey) private var outsideUS = false
+    @AppStorage(.locationKey) private var location: String?
 
     @State private var loginHelper = LoginItemHelper()
     @State private var model = ViewModel()
@@ -22,7 +22,7 @@ struct DexcomMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Glimpse", id: .settingsWindow) {
+        Window("Luka", id: .settingsWindow) {
             SettingsView(didLogIn: model.logIn)
         }
         .windowResizability(.contentSize)
@@ -85,14 +85,11 @@ struct DexcomMenuApp: App {
                 case .noRecentReading:
                     Image(systemName: "icloud.slash")
                 case .error:
-                    Image(systemName: "person.crop.circle.badge.xmark")
+                    Image(systemName: "wifi.slash")
                 }
             } else {
-                Text("Glimpse")
+                Text("Luka")
             }
-        }
-        .onChange(of: outsideUS) { _, newValue in
-            model.outsideUS = newValue
         }
     }
 }

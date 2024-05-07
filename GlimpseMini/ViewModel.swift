@@ -18,15 +18,7 @@ import KeychainAccess
     }
 
     var isLoggedIn: Bool {
-        username != nil && password != nil
-    }
-
-    var outsideUS: Bool = UserDefaults.standard.bool(forKey: .outsideUSKey) {
-        didSet { 
-            if outsideUS != oldValue {
-                setUpClientAndBeginRefreshing()
-            }
-        }
+        username != nil && password != nil && location != nil
     }
 
     private(set) var reading: State = .initial
@@ -34,6 +26,7 @@ import KeychainAccess
 
     private(set) var username: String? = Keychain.standard[.usernameKey]
     private(set) var password: String? = Keychain.standard[.passwordKey]
+    private(set) var location: String? = UserDefaults.standard.string(forKey: .locationKey)
 
     private var client: DexcomClient?
     private let decoder = JSONDecoder()
@@ -52,21 +45,22 @@ import KeychainAccess
         setUpClientAndBeginRefreshing()
     }
 
-    func logIn(username: String, password: String) {
+    func logIn(username: String, password: String, accountLocation: AccountLocation) {
         self.username = username
         self.password = password
+        self.location = accountLocation.rawValue
 
         setUpClientAndBeginRefreshing()
     }
 
     private func setUpClientAndBeginRefreshing() {
-        if let username, let password {
+        if let username, let password, let location, let accountLocation = AccountLocation(rawValue: location) {
             reading = .initial
 
             client = DexcomClient(
                 username: username,
                 password: password,
-                outsideUS: outsideUS
+                accountLocation: accountLocation
             )
 
             beginRefreshing()

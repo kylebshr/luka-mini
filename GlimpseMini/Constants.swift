@@ -10,7 +10,7 @@ import Foundation
 extension String {
     static let usernameKey = "username"
     static let passwordKey = "password"
-    static let outsideUSKey = "ous"
+    static let locationKey = "location"
     static let settingsWindow = "settings"
     static let useMMOLKey = "mmol"
 }
