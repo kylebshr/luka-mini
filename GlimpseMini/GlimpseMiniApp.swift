@@ -74,9 +74,7 @@ struct DexcomMenuApp: App {
                 case .initial:
                     Text("--")
                 case .loaded(let reading):
-                    let value = useMMOL
-                    ? (Double(reading.value) * .mmolConversionFactor).formatted(.number.precision(.fractionLength(1)))
-                    : reading.value.formatted()
+                    let value = reading.value.formatted(.glucose(useMMOL ? .mmolL : .mgdl))
 
                     HStack {
                         reading.trend.image
