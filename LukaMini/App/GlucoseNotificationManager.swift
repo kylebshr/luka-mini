@@ -80,7 +80,7 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
 
         let unit: GlucoseFormatter.Unit = useMMOL ? .mmolL : .mgdl
         let unitName = useMMOL ? "mmol/L" : "mg/dL"
-        let value = reading.value.formatted(.glucose(unit))
+        let value = reading.value.formatted(.glucose(unit, usesOutOfRangeText: false))
         let lower = lowerBound.formatted(.glucose(unit))
         let upper = upperBound.formatted(.glucose(unit))
 
