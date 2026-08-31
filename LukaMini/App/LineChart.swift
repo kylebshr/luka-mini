@@ -12,7 +12,15 @@ import Dexcom
 struct LineChart: View {
     private let lowerBound: Double = 70
     private let upperBound: Double = 180
-    private let graphUpperBound: Double = 300
+    private let defaultGraphUpperBound: Double = 300
+
+    /// Upper bound for the full-range (menu) graph. Defaults to 300, but grows to
+    /// fit higher readings (rounded up to the next 50) so they aren't clipped.
+    private var graphUpperBound: Double {
+        let dataMax = filteredReadings.map(\.v).max().map(Double.init) ?? 0
+        guard dataMax > defaultGraphUpperBound else { return defaultGraphUpperBound }
+        return (dataMax / 50).rounded(.up) * 50
+    }
     @AppStorage(.useMMOLKey) private var useMMOL = false
     private var unit: GlucoseFormatter.Unit { useMMOL ? .mmolL : .mgdl }
 
@@ -105,14 +113,12 @@ struct LineChart: View {
     var body: some View {
         Chart {
             ForEach(filteredReadings, id: \.t) { reading in
-                let clampedValue = useFullYRange ? min(reading.v, Int16(graphUpperBound)) : reading.v
-
                 switch style {
                 case .dots:
                     if reading != emphasizedReading {
                         PointMark(
                             x: .value("Date", reading.t),
-                            y: .value("Glucose", clampedValue)
+                            y: .value("Glucose", reading.v)
                         )
                         .foregroundStyle(colorForValue(Int(reading.v)))
                         .symbolSize(dotSymbolSize)
@@ -120,7 +126,7 @@ struct LineChart: View {
                 case .line:
                     LineMark(
                         x: .value("Date", reading.t),
-                        y: .value("Glucose", clampedValue)
+                        y: .value("Glucose", reading.v)
                     )
                     .foregroundStyle(
                         LinearGradient(
@@ -135,8 +141,6 @@ struct LineChart: View {
             }
 
             if let emphasizedReading {
-                let clampedValue = useFullYRange ? min(emphasizedReading.v, Int16(graphUpperBound)) : emphasizedReading.v
-
                 if selectedReading?.wrappedValue != nil {
                     RuleMark(x: .value("Date", emphasizedReading.t))
                         .foregroundStyle(Color.secondary)
@@ -145,7 +149,7 @@ struct LineChart: View {
 
                 PointMark(
                     x: .value("Date", emphasizedReading.t),
-                    y: .value("Glucose", clampedValue)
+                    y: .value("Glucose", emphasizedReading.v)
                 )
                 .foregroundStyle(colorForValue(Int(emphasizedReading.v)))
                 .symbolSize(emphasizedDotSymbolSize)
