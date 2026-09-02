@@ -10,8 +10,6 @@ import Charts
 import Dexcom
 
 struct LineChart: View {
-    private let lowerBound: Double = 70
-    private let upperBound: Double = 180
     private let defaultGraphUpperBound: Double = 300
 
     /// Upper bound for the full-range (menu) graph. Defaults to 300, but grows to
