@@ -3,6 +3,7 @@
 //  LukaMini
 //
 
+import AppKit
 import SwiftUI
 
 enum GlucoseRange {
@@ -34,6 +35,14 @@ enum GlucoseRange {
         lowerBound: Int = defaultLowerBound,
         upperBound: Int = defaultUpperBound
     ) -> Color {
+        Color(nsColor: nsColor(for: value, lowerBound: lowerBound, upperBound: upperBound))
+    }
+
+    static func nsColor(
+        for value: Int,
+        lowerBound: Int = defaultLowerBound,
+        upperBound: Int = defaultUpperBound
+    ) -> NSColor {
         switch classification(for: value, lowerBound: lowerBound, upperBound: upperBound) {
         case .low:
             .lowColor

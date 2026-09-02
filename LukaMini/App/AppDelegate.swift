@@ -139,10 +139,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     button.attributedTitle = NSAttributedString(
                         string: title,
                         attributes: [
-                            .font: NSFont.systemFont(
-                                ofSize: button.font?.pointSize ?? NSFont.systemFontSize,
-                                weight: .semibold
-                            ),
+                            .font: button.font ?? NSFont.menuBarFont(ofSize: 0),
                             .foregroundColor: color,
                         ]
                     )
@@ -170,27 +167,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             return nil
         }
 
-        let classification = GlucoseRange.classification(
+        return GlucoseRange.nsColor(
             for: reading.value,
             lowerBound: lowerGlucoseThreshold,
             upperBound: upperGlucoseThreshold
         )
-        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-
-        let baseColor: NSColor = switch classification {
-        case .low:
-            .systemRed
-        case .inRange:
-            .systemGreen
-        case .high:
-            .systemOrange
-        }
-
-        if isDark {
-            return baseColor.blended(withFraction: 0.12, of: .white) ?? baseColor
-        } else {
-            return baseColor.blended(withFraction: 0.35, of: .black) ?? baseColor
-        }
+        .resolved(for: appearance)
     }
 
     private func statusTitle(for model: GlucoseProfileModel, includeName: Bool) -> String {

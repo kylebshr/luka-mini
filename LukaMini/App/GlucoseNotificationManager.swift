@@ -14,7 +14,12 @@ import UserNotifications
 final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelegate {
     static let shared = GlucoseNotificationManager()
 
-    private var lastClassification: [GlucoseProfile.ID: GlucoseRange.Classification] = [:]
+    private struct Observation {
+        var readingDate: Date
+        var classification: GlucoseRange.Classification
+    }
+
+    private var observations: [GlucoseProfile.ID: Observation] = [:]
 
     private override init() {
         super.init()
@@ -56,12 +61,16 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
             lowerBound: lowerBound,
             upperBound: upperBound
         )
-        let previous = lastClassification[model.id]
-        lastClassification[model.id] = classification
+        let previous = observations[model.id]
+        observations[model.id] = Observation(readingDate: reading.date, classification: classification)
+
+        // Re-evaluating the same reading (e.g. while editing thresholds) never
+        // alerts; only a new reading can trigger a notification.
+        if let previous, previous.readingDate == reading.date { return }
 
         // Track state even when disabled so that turning the setting on
         // doesn't immediately fire for a reading the user has already seen.
-        guard enabled, classification != .inRange, previous != classification else {
+        guard enabled, classification != .inRange, previous?.classification != classification else {
             if classification == .inRange {
                 UNUserNotificationCenter.current()
                     .removeDeliveredNotifications(withIdentifiers: [notificationID(for: model.id)])
@@ -69,12 +78,15 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
             return
         }
 
-        let value = reading.value.formatted(.glucose(useMMOL ? .mmolL : .mgdl))
-        let unit = useMMOL ? "mmol/L" : "mg/dL"
+        let unit: GlucoseFormatter.Unit = useMMOL ? .mmolL : .mgdl
+        let unitName = useMMOL ? "mmol/L" : "mg/dL"
+        let value = reading.value.formatted(.glucose(unit))
+        let lower = lowerBound.formatted(.glucose(unit))
+        let upper = upperBound.formatted(.glucose(unit))
 
         let content = UNMutableNotificationContent()
-        content.title = classification == .low ? "Low Glucose" : "High Glucose"
-        content.body = "\(model.displayName) is \(value) \(unit)"
+        content.title = "\(model.displayName): \(classification == .low ? "Low" : "High") Glucose"
+        content.body = "\(value) \(unitName) is outside the target range of \(lower)–\(upper) \(unitName)."
         content.sound = .default
         content.interruptionLevel = .timeSensitive
 
