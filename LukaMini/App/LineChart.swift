@@ -21,8 +21,13 @@ struct LineChart: View {
         guard dataMax > defaultGraphUpperBound else { return defaultGraphUpperBound }
         return (dataMax / 50).rounded(.up) * 50
     }
+
     @AppStorage(.useMMOLKey) private var useMMOL = false
+    @AppStorage(.lowerGlucoseThresholdKey) private var lowerGlucoseThreshold = GlucoseRange.defaultLowerBound
+    @AppStorage(.upperGlucoseThresholdKey) private var upperGlucoseThreshold = GlucoseRange.defaultUpperBound
     private var unit: GlucoseFormatter.Unit { useMMOL ? .mmolL : .mgdl }
+    private var lowerBound: Double { Double(lowerGlucoseThreshold) }
+    private var upperBound: Double { Double(upperGlucoseThreshold) }
 
     var range: GraphRange
     var style: GraphStyle
@@ -120,7 +125,13 @@ struct LineChart: View {
                             x: .value("Date", reading.t),
                             y: .value("Glucose", reading.v)
                         )
-                        .foregroundStyle(colorForValue(Int(reading.v)))
+                        .foregroundStyle(
+                            GlucoseRange.color(
+                                for: Int(reading.v),
+                                lowerBound: lowerGlucoseThreshold,
+                                upperBound: upperGlucoseThreshold
+                            )
+                        )
                         .symbolSize(dotSymbolSize)
                     }
                 case .line:
@@ -151,7 +162,13 @@ struct LineChart: View {
                     x: .value("Date", emphasizedReading.t),
                     y: .value("Glucose", emphasizedReading.v)
                 )
-                .foregroundStyle(colorForValue(Int(emphasizedReading.v)))
+                .foregroundStyle(
+                    GlucoseRange.color(
+                        for: Int(emphasizedReading.v),
+                        lowerBound: lowerGlucoseThreshold,
+                        upperBound: upperGlucoseThreshold
+                    )
+                )
                 .symbolSize(emphasizedDotSymbolSize)
                 .symbol(DonutSymbolShape(fill: style == .line))
             }
@@ -186,7 +203,7 @@ struct LineChart: View {
                 AxisMarks(values: rangeMarks) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                     AxisValueLabel(
-                        format: GlucoseFormatter(unit: unit),
+                        format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                         collisionResolution: .greedy(priority: 50)
                     )
                 }
@@ -195,7 +212,7 @@ struct LineChart: View {
                 AxisMarks(values: boundaryMarks) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                     AxisValueLabel(
-                        format: GlucoseFormatter(unit: unit),
+                        format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                         collisionResolution: .greedy(priority: 50)
                     )
                 }
@@ -205,10 +222,10 @@ struct LineChart: View {
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                             .foregroundStyle(Color.lowColor.secondary)
                         AxisValueLabel(
-                            format: GlucoseFormatter(unit: unit),
+                            format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                             collisionResolution: .greedy(priority: 100)
                         )
-                    }
+                        }
                 }
             }
         }
@@ -267,7 +284,11 @@ struct LineChart: View {
         guard dataRange > 0 else {
             // All values are the same, pick appropriate color
             let value = Int(dataMin)
-            let color = colorForValue(value)
+            let color = GlucoseRange.color(
+                for: value,
+                lowerBound: lowerGlucoseThreshold,
+                upperBound: upperGlucoseThreshold
+            )
             return [Gradient.Stop(color: color, location: 0)]
         }
 
@@ -297,16 +318,6 @@ struct LineChart: View {
         stops.append(Gradient.Stop(color: topColor, location: 1))
 
         return stops.sorted { $0.location < $1.location }
-    }
-
-    private func colorForValue(_ value: Int) -> Color {
-        if value < Int(lowerBound) {
-            return .lowColor
-        } else if value > Int(upperBound) {
-            return .highColor
-        } else {
-            return .inRangeColor
-        }
     }
 
     private func readingClosest(to date: Date) -> LiveActivityState.Reading? {

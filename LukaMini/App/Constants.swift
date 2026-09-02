@@ -14,6 +14,10 @@ extension String {
     static let useMMOLKey = "mmol"
     static let graphRangeKey = "graphRange"
     static let showNamesForMultipleUsersKey = "showNamesForMultipleUsers"
+    static let colorMenuBarReadingKey = "colorMenuBarReading"
+    static let lowerGlucoseThresholdKey = "lowerGlucoseThreshold"
+    static let upperGlucoseThresholdKey = "upperGlucoseThreshold"
+    static let outOfRangeNotificationsKey = "outOfRangeNotifications"
     static let useServerForReadingsKey = "useServerForReadings"
     static let profilesKey = "profiles"
 }

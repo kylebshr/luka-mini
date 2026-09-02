@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import CoreText
 import Dexcom
 import SwiftUI
 
@@ -18,6 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        GlucoseNotificationManager.shared.configure()
+
         appModel.profileModelsDidChange = { [weak self] in
             self?.rebuildStatusItems()
         }
@@ -76,6 +79,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         UserDefaults.standard.object(forKey: .showNamesForMultipleUsersKey) as? Bool ?? true
     }
 
+    private var colorMenuBarReading: Bool {
+        UserDefaults.standard.bool(forKey: .colorMenuBarReadingKey)
+    }
+
+    private var lowerGlucoseThreshold: Int {
+        UserDefaults.standard.object(forKey: .lowerGlucoseThresholdKey) as? Int
+            ?? GlucoseRange.defaultLowerBound
+    }
+
+    private var upperGlucoseThreshold: Int {
+        UserDefaults.standard.object(forKey: .upperGlucoseThresholdKey) as? Int
+            ?? GlucoseRange.defaultUpperBound
+    }
+
+    private var outOfRangeNotifications: Bool {
+        UserDefaults.standard.bool(forKey: .outOfRangeNotificationsKey)
+    }
+
     private func rebuildStatusItems() {
         for item in statusItems {
             NSStatusBar.system.removeStatusItem(item)
@@ -112,9 +133,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let menu = item.menu as? ProfileMenu
 
             if let id = menu?.profileID, let model = appModel.model(for: id) {
-                button.title = statusTitle(for: model, includeName: includeName)
-                button.image = statusImage(for: model)
+                let color = statusColor(for: model, appearance: button.effectiveAppearance)
+                button.attributedTitle = statusAttributedTitle(
+                    for: model,
+                    includeName: includeName,
+                    font: button.font,
+                    color: color
+                )
+                button.image = statusImage(for: model, color: color)
                 button.toolTip = model.message.map { "\(model.displayName): \($0)" } ?? model.displayName
+
+                GlucoseNotificationManager.shared.evaluate(
+                    model: model,
+                    includeName: appModel.profileModels.count > 1,
+                    enabled: outOfRangeNotifications,
+                    lowerBound: lowerGlucoseThreshold,
+                    upperBound: upperGlucoseThreshold,
+                    useMMOL: UserDefaults.standard.bool(forKey: .useMMOLKey)
+                )
             } else {
                 button.title = "Luka"
                 button.image = nil
@@ -123,7 +159,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
-    private func statusTitle(for model: GlucoseProfileModel, includeName: Bool) -> String {
+    private func statusColor(for model: GlucoseProfileModel, appearance: NSAppearance) -> NSColor? {
+        guard colorMenuBarReading, case .loaded(let reading) = model.reading else {
+            return nil
+        }
+
+        return GlucoseRange.nsColor(
+            for: reading.value,
+            lowerBound: lowerGlucoseThreshold,
+            upperBound: upperGlucoseThreshold
+        )
+        .resolved(for: appearance)
+    }
+
+    private func statusTitleParts(for model: GlucoseProfileModel, includeName: Bool) -> (name: String?, value: String) {
         let useMMOL = UserDefaults.standard.bool(forKey: .useMMOLKey)
         let value: String = switch model.reading {
         case .initial: "--"
@@ -131,13 +180,37 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .noRecentReading, .error: ""
         }
 
-        if includeName {
-            return value.isEmpty ? model.displayName : "\(model.displayName) \(value)"
-        }
-        return value
+        return (includeName ? model.displayName : nil, value)
     }
 
-    private func statusImage(for model: GlucoseProfileModel) -> NSImage? {
+    /// Builds the status-bar title. The reading is rendered with lowercase
+    /// small caps so out-of-range "Low"/"Hi" labels from the formatter look
+    /// intentional; digits and the profile name are unaffected.
+    private func statusAttributedTitle(
+        for model: GlucoseProfileModel,
+        includeName: Bool,
+        font: NSFont?,
+        color: NSColor?
+    ) -> NSAttributedString {
+        let (name, value) = statusTitleParts(for: model, includeName: includeName)
+        let baseFont = font ?? .menuBarFont(ofSize: 0)
+
+        var baseAttributes: [NSAttributedString.Key: Any] = [.font: baseFont]
+        if let color {
+            baseAttributes[.foregroundColor] = color
+        }
+        var valueAttributes = baseAttributes
+        valueAttributes[.font] = baseFont.withLowercaseSmallCaps()
+
+        let title = NSMutableAttributedString()
+        if let name {
+            title.append(NSAttributedString(string: value.isEmpty ? name : "\(name) ", attributes: baseAttributes))
+        }
+        title.append(NSAttributedString(string: value, attributes: valueAttributes))
+        return title
+    }
+
+    private func statusImage(for model: GlucoseProfileModel, color: NSColor?) -> NSImage? {
         if !model.isConfigured {
             return NSImage(systemSymbolName: "person.crop.circle.badge.exclamationmark", accessibilityDescription: "Not Signed In")
         }
@@ -145,7 +218,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .initial:
             return nil
         case .loaded(let reading):
-            return reading.trend.nsImage
+            return reading.trend.nsImage(color: color)
         case .noRecentReading, .error:
             return NSImage(systemSymbolName: "icloud.slash", accessibilityDescription: "Error")
         }
@@ -325,7 +398,7 @@ struct MenuGraphView: View {
 }
 
 extension TrendDirection {
-    var nsImage: NSImage? {
+    func nsImage(color: NSColor?) -> NSImage? {
         let image: NSImage? = switch self {
         case .none:
             nil
@@ -349,7 +422,32 @@ extension TrendDirection {
             NSImage(systemSymbolName: "exclamationmark", accessibilityDescription: nil)
         }
 
-        image?.isTemplate = true
+        guard let image else { return nil }
+
+        if let color,
+           let coloredImage = image.withSymbolConfiguration(
+               NSImage.SymbolConfiguration(paletteColors: [color])
+            ) {
+            coloredImage.isTemplate = false
+            return coloredImage
+        }
+
+        image.isTemplate = true
         return image
+    }
+}
+
+extension NSFont {
+    /// The AppKit equivalent of SwiftUI's `.lowercaseSmallCaps()`.
+    func withLowercaseSmallCaps() -> NSFont {
+        let descriptor = fontDescriptor.addingAttributes([
+            .featureSettings: [
+                [
+                    NSFontDescriptor.FeatureKey.typeIdentifier: kLowerCaseType,
+                    NSFontDescriptor.FeatureKey.selectorIdentifier: kLowerCaseSmallCapsSelector,
+                ],
+            ],
+        ])
+        return NSFont(descriptor: descriptor, size: pointSize) ?? self
     }
 }
