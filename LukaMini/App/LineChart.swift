@@ -196,7 +196,7 @@ struct LineChart: View {
                 AxisMarks(values: rangeMarks) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                     AxisValueLabel(
-                        format: GlucoseFormatter(unit: unit),
+                        format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                         collisionResolution: .greedy(priority: 50)
                     )
                 }
@@ -205,7 +205,7 @@ struct LineChart: View {
                 AxisMarks(values: boundaryMarks) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                     AxisValueLabel(
-                        format: GlucoseFormatter(unit: unit),
+                        format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                         collisionResolution: .greedy(priority: 50)
                     )
                 }
@@ -215,10 +215,10 @@ struct LineChart: View {
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 2]))
                             .foregroundStyle(Color.lowColor.secondary)
                         AxisValueLabel(
-                            format: GlucoseFormatter(unit: unit),
+                            format: GlucoseFormatter(unit: unit, usesOutOfRangeText: false),
                             collisionResolution: .greedy(priority: 100)
                         )
-                    }
+                        }
                 }
             }
         }

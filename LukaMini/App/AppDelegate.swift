@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import CoreText
 import Dexcom
 import SwiftUI
 
@@ -132,18 +133,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let menu = item.menu as? ProfileMenu
 
             if let id = menu?.profileID, let model = appModel.model(for: id) {
-                let title = statusTitle(for: model, includeName: includeName)
                 let color = statusColor(for: model, appearance: button.effectiveAppearance)
-                button.title = title
-                if let color {
-                    button.attributedTitle = NSAttributedString(
-                        string: title,
-                        attributes: [
-                            .font: button.font ?? NSFont.menuBarFont(ofSize: 0),
-                            .foregroundColor: color,
-                        ]
-                    )
-                }
+                button.attributedTitle = statusAttributedTitle(
+                    for: model,
+                    includeName: includeName,
+                    font: button.font,
+                    color: color
+                )
                 button.image = statusImage(for: model, color: color)
                 button.toolTip = model.message.map { "\(model.displayName): \($0)" } ?? model.displayName
 
@@ -176,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         .resolved(for: appearance)
     }
 
-    private func statusTitle(for model: GlucoseProfileModel, includeName: Bool) -> String {
+    private func statusTitleParts(for model: GlucoseProfileModel, includeName: Bool) -> (name: String?, value: String) {
         let useMMOL = UserDefaults.standard.bool(forKey: .useMMOLKey)
         let value: String = switch model.reading {
         case .initial: "--"
@@ -184,10 +180,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .noRecentReading, .error: ""
         }
 
-        if includeName {
-            return value.isEmpty ? model.displayName : "\(model.displayName) \(value)"
+        return (includeName ? model.displayName : nil, value)
+    }
+
+    /// Builds the status-bar title. The reading is rendered with lowercase
+    /// small caps so out-of-range "Low"/"Hi" labels from the formatter look
+    /// intentional; digits and the profile name are unaffected.
+    private func statusAttributedTitle(
+        for model: GlucoseProfileModel,
+        includeName: Bool,
+        font: NSFont?,
+        color: NSColor?
+    ) -> NSAttributedString {
+        let (name, value) = statusTitleParts(for: model, includeName: includeName)
+        let baseFont = font ?? .menuBarFont(ofSize: 0)
+
+        var baseAttributes: [NSAttributedString.Key: Any] = [.font: baseFont]
+        if let color {
+            baseAttributes[.foregroundColor] = color
         }
-        return value
+        var valueAttributes = baseAttributes
+        valueAttributes[.font] = baseFont.withLowercaseSmallCaps()
+
+        let title = NSMutableAttributedString()
+        if let name {
+            title.append(NSAttributedString(string: value.isEmpty ? name : "\(name) ", attributes: baseAttributes))
+        }
+        title.append(NSAttributedString(string: value, attributes: valueAttributes))
+        return title
     }
 
     private func statusImage(for model: GlucoseProfileModel, color: NSColor?) -> NSImage? {
@@ -414,5 +434,20 @@ extension TrendDirection {
 
         image.isTemplate = true
         return image
+    }
+}
+
+extension NSFont {
+    /// The AppKit equivalent of SwiftUI's `.lowercaseSmallCaps()`.
+    func withLowercaseSmallCaps() -> NSFont {
+        let descriptor = fontDescriptor.addingAttributes([
+            .featureSettings: [
+                [
+                    NSFontDescriptor.FeatureKey.typeIdentifier: kLowerCaseType,
+                    NSFontDescriptor.FeatureKey.selectorIdentifier: kLowerCaseSmallCapsSelector,
+                ],
+            ],
+        ])
+        return NSFont(descriptor: descriptor, size: pointSize) ?? self
     }
 }
