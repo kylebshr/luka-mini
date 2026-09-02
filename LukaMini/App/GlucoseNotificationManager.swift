@@ -76,6 +76,7 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
         content.title = classification == .low ? "Low Glucose" : "High Glucose"
         content.body = "\(model.displayName) is \(value) \(unit)"
         content.sound = .default
+        content.interruptionLevel = .timeSensitive
 
         // Reusing the identifier replaces any earlier alert for this profile.
         let request = UNNotificationRequest(
