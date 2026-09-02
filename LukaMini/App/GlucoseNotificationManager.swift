@@ -49,6 +49,7 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
 
     func evaluate(
         model: GlucoseProfileModel,
+        includeName: Bool,
         enabled: Bool,
         lowerBound: Int,
         upperBound: Int,
@@ -85,8 +86,9 @@ final class GlucoseNotificationManager: NSObject, UNUserNotificationCenterDelega
         let upper = upperBound.formatted(.glucose(unit))
 
         let content = UNMutableNotificationContent()
-        content.title = "\(model.displayName): \(classification == .low ? "Low" : "High") Glucose"
-        content.body = "\(value) \(unitName) is outside the target range of \(lower)–\(upper) \(unitName)."
+        let title = classification == .low ? "Low Glucose" : "High Glucose"
+        content.title = includeName ? "\(model.displayName): \(title)" : title
+        content.body = "\(value) \(unitName) is outside the target range of \(lower)–\(upper) \(unitName)"
         content.sound = .default
         content.interruptionLevel = .timeSensitive
 

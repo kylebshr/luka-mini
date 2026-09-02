@@ -149,6 +149,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
                 GlucoseNotificationManager.shared.evaluate(
                     model: model,
+                    includeName: appModel.profileModels.count > 1,
                     enabled: outOfRangeNotifications,
                     lowerBound: lowerGlucoseThreshold,
                     upperBound: upperGlucoseThreshold,
