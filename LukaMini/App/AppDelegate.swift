@@ -18,6 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        GlucoseNotificationManager.shared.configure()
+
         appModel.profileModelsDidChange = { [weak self] in
             self?.rebuildStatusItems()
         }
@@ -76,6 +78,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         UserDefaults.standard.object(forKey: .showNamesForMultipleUsersKey) as? Bool ?? true
     }
 
+    private var colorMenuBarReading: Bool {
+        UserDefaults.standard.bool(forKey: .colorMenuBarReadingKey)
+    }
+
+    private var lowerGlucoseThreshold: Int {
+        UserDefaults.standard.object(forKey: .lowerGlucoseThresholdKey) as? Int
+            ?? GlucoseRange.defaultLowerBound
+    }
+
+    private var upperGlucoseThreshold: Int {
+        UserDefaults.standard.object(forKey: .upperGlucoseThresholdKey) as? Int
+            ?? GlucoseRange.defaultUpperBound
+    }
+
+    private var outOfRangeNotifications: Bool {
+        UserDefaults.standard.bool(forKey: .outOfRangeNotificationsKey)
+    }
+
     private func rebuildStatusItems() {
         for item in statusItems {
             NSStatusBar.system.removeStatusItem(item)
@@ -112,14 +132,64 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let menu = item.menu as? ProfileMenu
 
             if let id = menu?.profileID, let model = appModel.model(for: id) {
-                button.title = statusTitle(for: model, includeName: includeName)
-                button.image = statusImage(for: model)
+                let title = statusTitle(for: model, includeName: includeName)
+                let color = statusColor(for: model, appearance: button.effectiveAppearance)
+                button.title = title
+                if let color {
+                    button.attributedTitle = NSAttributedString(
+                        string: title,
+                        attributes: [
+                            .font: NSFont.systemFont(
+                                ofSize: button.font?.pointSize ?? NSFont.systemFontSize,
+                                weight: .semibold
+                            ),
+                            .foregroundColor: color,
+                        ]
+                    )
+                }
+                button.image = statusImage(for: model, color: color)
                 button.toolTip = model.message.map { "\(model.displayName): \($0)" } ?? model.displayName
+
+                GlucoseNotificationManager.shared.evaluate(
+                    model: model,
+                    enabled: outOfRangeNotifications,
+                    lowerBound: lowerGlucoseThreshold,
+                    upperBound: upperGlucoseThreshold,
+                    useMMOL: UserDefaults.standard.bool(forKey: .useMMOLKey)
+                )
             } else {
                 button.title = "Luka"
                 button.image = nil
                 button.toolTip = "Luka Mini"
             }
+        }
+    }
+
+    private func statusColor(for model: GlucoseProfileModel, appearance: NSAppearance) -> NSColor? {
+        guard colorMenuBarReading, case .loaded(let reading) = model.reading else {
+            return nil
+        }
+
+        let classification = GlucoseRange.classification(
+            for: reading.value,
+            lowerBound: lowerGlucoseThreshold,
+            upperBound: upperGlucoseThreshold
+        )
+        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+
+        let baseColor: NSColor = switch classification {
+        case .low:
+            .systemRed
+        case .inRange:
+            .systemGreen
+        case .high:
+            .systemOrange
+        }
+
+        if isDark {
+            return baseColor.blended(withFraction: 0.12, of: .white) ?? baseColor
+        } else {
+            return baseColor.blended(withFraction: 0.35, of: .black) ?? baseColor
         }
     }
 
@@ -137,7 +207,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return value
     }
 
-    private func statusImage(for model: GlucoseProfileModel) -> NSImage? {
+    private func statusImage(for model: GlucoseProfileModel, color: NSColor?) -> NSImage? {
         if !model.isConfigured {
             return NSImage(systemSymbolName: "person.crop.circle.badge.exclamationmark", accessibilityDescription: "Not Signed In")
         }
@@ -145,7 +215,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .initial:
             return nil
         case .loaded(let reading):
-            return reading.trend.nsImage
+            return reading.trend.nsImage(color: color)
         case .noRecentReading, .error:
             return NSImage(systemSymbolName: "icloud.slash", accessibilityDescription: "Error")
         }
@@ -325,7 +395,7 @@ struct MenuGraphView: View {
 }
 
 extension TrendDirection {
-    var nsImage: NSImage? {
+    func nsImage(color: NSColor?) -> NSImage? {
         let image: NSImage? = switch self {
         case .none:
             nil
@@ -349,7 +419,17 @@ extension TrendDirection {
             NSImage(systemSymbolName: "exclamationmark", accessibilityDescription: nil)
         }
 
-        image?.isTemplate = true
+        guard let image else { return nil }
+
+        if let color,
+           let coloredImage = image.withSymbolConfiguration(
+               NSImage.SymbolConfiguration(paletteColors: [color])
+            ) {
+            coloredImage.isTemplate = false
+            return coloredImage
+        }
+
+        image.isTemplate = true
         return image
     }
 }

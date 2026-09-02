@@ -16,12 +16,17 @@ struct SettingsView: View {
     @AppStorage(.useMMOLKey) private var useMMOL = false
     @AppStorage(.graphRangeKey) private var graphRange: GraphRange = .threeHours
     @AppStorage(.showNamesForMultipleUsersKey) private var showNamesForMultipleUsers = true
+    @AppStorage(.colorMenuBarReadingKey) private var colorMenuBarReading = false
+    @AppStorage(.lowerGlucoseThresholdKey) private var lowerGlucoseThreshold = GlucoseRange.defaultLowerBound
+    @AppStorage(.upperGlucoseThresholdKey) private var upperGlucoseThreshold = GlucoseRange.defaultUpperBound
+    @AppStorage(.outOfRangeNotificationsKey) private var outOfRangeNotifications = false
     @AppStorage(.useServerForReadingsKey) private var useServerForReadings = true
 
     @State private var selection: SettingsSelection = .general
     @State private var editor = ProfileEditorState()
     @State private var original = ProfileEditorState()
     @State private var isShowingDeleteAlert = false
+    @State private var isShowingNotificationPermissionAlert = false
 
     var body: some View {
         Group {
@@ -58,6 +63,12 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This removes \(deleteAlertProfileName) from Luka Mini and deletes the saved Dexcom credentials for this user.")
+        }
+        .alert("Notifications Are Disabled", isPresented: $isShowingNotificationPermissionAlert) {
+            Button("Open Notification Settings", action: openNotificationSettings)
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Allow notifications for Luka Mini in System Settings, then try again.")
         }
     }
 
@@ -136,6 +147,36 @@ struct SettingsView: View {
                 if appModel.profileModels.count > 1 {
                     Toggle("Show names", isOn: $showNamesForMultipleUsers)
                 }
+
+                Toggle("Color glucose reading", isOn: $colorMenuBarReading)
+
+                LabeledContent("Target range") {
+                    HStack(spacing: 6) {
+                        TextField(
+                            "",
+                            value: displayedLowerGlucoseThreshold,
+                            format: thresholdFormat
+                        )
+                        .accessibilityLabel("Low glucose threshold")
+                        .frame(width: 48)
+                        .multilineTextAlignment(.trailing)
+
+                        Text("to")
+                            .foregroundStyle(.secondary)
+
+                        TextField(
+                            "",
+                            value: displayedUpperGlucoseThreshold,
+                            format: thresholdFormat
+                        )
+                        .accessibilityLabel("High glucose threshold")
+                        .frame(width: 48)
+                        .multilineTextAlignment(.trailing)
+
+                        Text(useMMOL ? "mmol/L" : "mg/dL")
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
 
             Section("App") {
@@ -149,8 +190,21 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                     .font(.footnote)
             }
+
+            Section("Notifications") {
+                Toggle(
+                    "Notify outside target range",
+                    isOn: outOfRangeNotificationsBinding
+                )
+            }
         }
         .formStyle(.grouped)
+        .onChange(of: lowerGlucoseThreshold) { _, newValue in
+            lowerGlucoseThreshold = max(1, min(newValue, upperGlucoseThreshold - 1))
+        }
+        .onChange(of: upperGlucoseThreshold) { _, newValue in
+            upperGlucoseThreshold = max(lowerGlucoseThreshold + 1, min(newValue, 1_000))
+        }
     }
 
     private var profileDetail: some View {
@@ -207,6 +261,49 @@ struct SettingsView: View {
 
     private var canSave: Bool {
         editor.canSave && editor != original
+    }
+
+    private var displayedLowerGlucoseThreshold: Binding<Double> {
+        glucoseThresholdBinding(for: $lowerGlucoseThreshold)
+    }
+
+    private var outOfRangeNotificationsBinding: Binding<Bool> {
+        Binding {
+            outOfRangeNotifications
+        } set: { isEnabled in
+            if isEnabled {
+                Task {
+                    let authorized = await GlucoseNotificationManager.shared.requestAuthorization()
+                    if authorized {
+                        outOfRangeNotifications = true
+                    } else {
+                        isShowingNotificationPermissionAlert = true
+                    }
+                }
+            } else {
+                outOfRangeNotifications = false
+            }
+        }
+    }
+
+    private var displayedUpperGlucoseThreshold: Binding<Double> {
+        glucoseThresholdBinding(for: $upperGlucoseThreshold)
+    }
+
+    private var thresholdFormat: FloatingPointFormatStyle<Double> {
+        .number
+            .grouping(.never)
+            .precision(.fractionLength(useMMOL ? 1 : 0))
+    }
+
+    private func glucoseThresholdBinding(for threshold: Binding<Int>) -> Binding<Double> {
+        Binding {
+            let value = Double(threshold.wrappedValue)
+            return useMMOL ? value * .mmolConversionFactor : value
+        } set: { value in
+            let mgdl = useMMOL ? value / .mmolConversionFactor : value
+            threshold.wrappedValue = Int(mgdl.rounded())
+        }
     }
 
     private var deleteAlertProfileName: String {
@@ -288,6 +385,14 @@ struct SettingsView: View {
             #selector(NSSplitViewController.toggleSidebar(_:)),
             with: nil
         )
+    }
+
+    private func openNotificationSettings() {
+        let bundleID = Bundle.main.bundleIdentifier ?? ""
+        let destination = "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(bundleID)"
+        if let url = URL(string: destination) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func deleteSelectedProfile() {
